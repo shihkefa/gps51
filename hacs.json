@@ -1,0 +1,10 @@
+{
+  "name": "GPS51 Tracker",
+  "domain": "gps51",
+  "country": "worldwide",
+  "homeassistant": "2023.1.0",
+  "render_readme": true,
+  "zip_release": false,
+  "filename": "custom_components/gps51",
+  "source": "https://github.com/shihkefa/gps51"
+}
