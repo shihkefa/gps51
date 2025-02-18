@@ -9,7 +9,7 @@ After installation, you need to enter account, password, and device number when 
 Password Conversion Steps
 
 The password field must be converted to MD5 32-bit lowercase before use. You can use the following website for conversion:
-MD5 Conversion Website
+[MD5 Conversion Website](https://www.strerr.com/tw/md5.html)
 
 Conversion Example
 
