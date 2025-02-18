@@ -1,18 +1,30 @@
-將GPS51這款APP的設備接入homeassistant中
-安裝完成後新增設備時需輸入帳號密碼以及設備號碼
+# GPS51 Tracker Integration for Home Assistant
 
-密碼欄位要先自行轉換成MD5_32位小寫，可以參考換算網站
-https://www.strerr.com/tw/md5.html
+English | 中文 (https://github.com/shihkefa/gps51/blob/main/README_zh-tw.md)
 
-轉換驗證的參考範例
-例如Aa1357轉換後為b97712207d9544f05853a9c05c55061e
-要將b97712207d9544f05853a9c05c55061e輸入密碼欄位
+Connect GPS51 APP Devices to Home Assistant
 
+After installation, you need to enter account, password, and device number when adding a new device.
 
+Password Conversion Steps
 
-廣告時間，感謝溫州澤七物聯科技提供API文件
-如果有定位設備需要購買的
-可以微信wzzqwl166
+The password field must be converted to MD5 32-bit lowercase before use. You can use the following website for conversion:
+MD5 Conversion Website
 
-台灣地區或是海外地區使用，需另外特別註明使用地區
+Conversion Example
 
+For example, if your password is Aa1357, the MD5 conversion result is:
+
+b97712207d9544f05853a9c05c55061e
+
+Enter b97712207d9544f05853a9c05c55061e in the password field.
+
+Advertisement Time
+
+Thanks to Wenzhou Zeqi IoT Technology for providing the API documentation.
+
+If you need to purchase a positioning device, please contact:
+
+WeChat: wzzqwl166
+
+If you are using it in Taiwan or overseas, please specify the usage region separately.
