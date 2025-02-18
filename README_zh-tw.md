@@ -2,7 +2,7 @@
 
 
 
-[English](https://github.com/shihkefa/gps51/blob/main/README.md)| 正體中文
+[English](https://github.com/shihkefa/gps51/blob/main/README.md)| 中文
 
 安裝完成後，新增設備時需要輸入 帳號、密碼、設備號碼。
 
