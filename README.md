@@ -1,6 +1,6 @@
 # GPS51 Tracker Integration for Home Assistant
 
-English | 中文 (https://github.com/shihkefa/gps51/blob/main/README_zh-tw.md)
+English | [中文](https://github.com/shihkefa/gps51/blob/main/README_zh-tw.md)
 
 Connect GPS51 APP Devices to Home Assistant
 
