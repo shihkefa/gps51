@@ -1,3 +1,13 @@
+import logging
+import requests
+from homeassistant.config_entries import ConfigEntry
+from homeassistant.core import HomeAssistant  # ✅ 確保導入 HomeAssistant 類別
+from homeassistant.helpers import config_validation as cv
+
+from .const import DOMAIN, API_URL, LOGIN_ACTION
+
+_LOGGER = logging.getLogger(__name__)
+
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     """Set up GPS51 from a config entry."""
     hass.data.setdefault(DOMAIN, {})
