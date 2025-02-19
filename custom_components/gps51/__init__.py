@@ -1,26 +1,13 @@
-import logging
-import requests
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant
-
-from .const import DOMAIN, API_URL, LOGIN_ACTION
-
-_LOGGER = logging.getLogger(__name__)
-
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     """Set up GPS51 from a config entry."""
     hass.data.setdefault(DOMAIN, {})
 
     username = entry.data.get("username")
     password = entry.data.get("password")
-    deviceid = entry.data.get("deviceid")  # 讀取使用者輸入的 device ID
-
-    if not username or not password or not deviceid:
-        _LOGGER.error("Username, password, or device ID is missing in GPS51 config entry")
-        return False
+    deviceid = entry.data.get("deviceid")
 
     def get_token():
-        """Login and get token from GPS51 API."""
+        """Login and get a new token from GPS51 API."""
         payload = {
             "type": "USER",
             "from": "web",
@@ -28,7 +15,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
             "password": password,
             "browser": "Chrome/104.0.0.0"
         }
-        response = requests.post(f"{API_URL}?action={LOGIN_ACTION}", json=payload)
+        response = requests.post(f"{API_URL}?action=login", json=payload)
         if response.status_code == 200:
             data = response.json()
             if data.get("status") == 0 and "token" in data:
@@ -42,8 +29,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         return False
 
     hass.data[DOMAIN]["token"] = token
-    hass.data[DOMAIN]["deviceid"] = deviceid  # 儲存 device ID
-    _LOGGER.info(f"GPS51 login successful, token received. Tracking device {deviceid}")
+    hass.data[DOMAIN]["deviceid"] = deviceid
+    _LOGGER.info(f"GPS51 login successful, token received: {token}")
 
     # 註冊 `device_tracker`
     hass.async_create_task(
