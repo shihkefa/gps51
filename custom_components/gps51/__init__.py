@@ -1,7 +1,7 @@
 import logging
 import requests
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant  # ✅ 確保導入 HomeAssistant 類別
+from homeassistant.core import HomeAssistant
 from homeassistant.helpers import config_validation as cv
 
 from .const import DOMAIN, API_URL, LOGIN_ACTION
@@ -32,6 +32,13 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
                 return data["token"]
         return None
 
+    async def refresh_token():
+        """定時更新 `token`，避免過期"""
+        while True:
+            await hass.async_add_executor_job(get_token)
+            _LOGGER.info("GPS51 token 已更新")
+            await asyncio.sleep(1800)  # 每 30 分鐘更新一次
+
     token = await hass.async_add_executor_job(get_token)
 
     if not token:
@@ -41,6 +48,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     hass.data[DOMAIN]["token"] = token
     hass.data[DOMAIN]["deviceid"] = deviceid
     _LOGGER.info(f"GPS51 login successful, token received: {token}")
+
+    # 啟動 token 自動更新
+    hass.loop.create_task(refresh_token())
 
     # 註冊 `device_tracker`
     hass.async_create_task(
