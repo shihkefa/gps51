@@ -2,7 +2,7 @@ import logging
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from .const import DOMAIN
-from .coordinator import GPS51Coordinator
+from .coordinator import GPS51TokenCoordinator
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -10,13 +10,12 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     """Set up GPS51 from a config entry."""
     username = entry.data["username"]
     password = entry.data["password"]
-    deviceid = entry.data["deviceid"]
 
-    coordinator = GPS51Coordinator(hass, username, password, deviceid)
-    await coordinator.async_config_entry_first_refresh()
+    token_coordinator = GPS51TokenCoordinator(hass, username, password)
+    await token_coordinator.async_config_entry_first_refresh()
 
     hass.data.setdefault(DOMAIN, {})
-    hass.data[DOMAIN] = coordinator
+    hass.data[DOMAIN] = token_coordinator  # ✅ 只儲存 `token` 管理器
 
     # 註冊 `device_tracker`
     hass.async_create_task(
