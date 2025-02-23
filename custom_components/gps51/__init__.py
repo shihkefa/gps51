@@ -15,11 +15,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     await token_coordinator.async_config_entry_first_refresh()
 
     hass.data.setdefault(DOMAIN, {})
-    hass.data[DOMAIN] = token_coordinator  # ✅ 只儲存 `token` 管理器
+    hass.data[DOMAIN] = token_coordinator  # ✅ 儲存 `token` 管理器
 
-    # 註冊 `device_tracker`
-    hass.async_create_task(
-        hass.config_entries.async_forward_entry_setup(entry, "device_tracker")
-    )
+    # ✅ 這裡用 `await` 確保 `device_tracker` 先完成設定
+    await hass.config_entries.async_forward_entry_setups(entry, ["device_tracker"])
 
     return True
