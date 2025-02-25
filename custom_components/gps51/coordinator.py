@@ -23,7 +23,7 @@ class GPS51TokenCoordinator:
         async_track_time_change(
             self.hass,
             self._schedule_token_refresh,
-            hour=[0, 12],
+            hour=[0, 4, 8, 12, 16, 20],
             minute=0,
             second=0,
         )
