@@ -12,12 +12,13 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     password = entry.data["password"]
 
     token_coordinator = GPS51TokenCoordinator(hass, username, password)
-    await token_coordinator.async_config_entry_first_refresh()
+    # 呼叫初始更新方法，讓 token 先獲取一次
+    await token_coordinator._async_update_token()
 
     hass.data.setdefault(DOMAIN, {})
-    hass.data[DOMAIN] = token_coordinator  # ✅ 儲存 `token` 管理器
+    hass.data[DOMAIN] = token_coordinator  # 儲存 token 管理器
 
-    # ✅ 這裡用 `await` 確保 `device_tracker` 先完成設定
+    # 使用新的 async_forward_entry_setups 載入 device_tracker
     await hass.config_entries.async_forward_entry_setups(entry, ["device_tracker"])
 
     return True
