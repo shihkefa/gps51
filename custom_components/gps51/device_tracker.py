@@ -1,5 +1,6 @@
 import logging
 import aiohttp
+import asyncio
 from datetime import timedelta
 from homeassistant.components.device_tracker import TrackerEntity
 from homeassistant.config_entries import ConfigEntry
@@ -9,6 +10,7 @@ from .const import DOMAIN, API_URL, LAST_POSITION_ACTION
 _LOGGER = logging.getLogger(__name__)
 
 SCAN_INTERVAL = timedelta(seconds=60)  # ✅ 讓 HA 每 60 秒自動更新
+TIMEOUT = 15  # ✅ 設定 API 超時為 15 秒
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_entities):
     """Set up GPS51 device tracker from a config entry."""
@@ -25,13 +27,18 @@ class GPS51DeviceTracker(TrackerEntity):
         """Initialize the GPS tracker."""
         self._deviceid = deviceid
         self._token_coordinator = token_coordinator
-        self._attr_unique_id = f"gps51_tracker_{deviceid}"
+        self._attr_unique_id = f"gps51_tracker_{deviceid}"  # ✅ 設定唯一 ID
         self._attr_name = f"GPS51 Tracker {deviceid}"
         self._attr_latitude = None
         self._attr_longitude = None
         self._attr_speed = None
         self._attr_status = None
         self.session = aiohttp.ClientSession()
+
+    @property
+    def unique_id(self):
+        """Return a unique ID for this device tracker."""
+        return self._attr_unique_id  # ✅ 讓 HA 可以管理這個設備
 
     @property
     def should_poll(self):
@@ -48,6 +55,13 @@ class GPS51DeviceTracker(TrackerEntity):
 
     async def async_update(self):
         """Fetch new state data for the tracker."""
+        try:
+            await asyncio.wait_for(self._fetch_gps_data(), timeout=TIMEOUT)  # ✅ 限制 API 呼叫時間
+        except asyncio.TimeoutError:
+            _LOGGER.warning(f"GPS51 更新超時（{self._deviceid}），跳過這次更新")
+
+    async def _fetch_gps_data(self):
+        """Fetch new state data from API."""
         token = self._token_coordinator.token
         if not token:
             _LOGGER.warning("GPS51 token is missing, skipping update.")
@@ -58,7 +72,7 @@ class GPS51DeviceTracker(TrackerEntity):
         headers = {"Content-Type": "application/json"}
 
         try:
-            async with self.session.post(url, json=payload, headers=headers) as response:
+            async with self.session.post(url, json=payload, headers=headers, timeout=TIMEOUT) as response:
                 if response.status != 200:
                     _LOGGER.warning(f"GPS51 API 請求失敗: {response.status}")
                     return
