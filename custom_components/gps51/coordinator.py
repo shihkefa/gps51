@@ -1,7 +1,7 @@
 import logging
 import requests
 import time
-from datetime import timedelta, time
+from datetime import timedelta
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers.event import async_track_time_change, async_track_time_interval
 from .const import DOMAIN, API_URL, LOGIN_ACTION
@@ -10,10 +10,10 @@ _LOGGER = logging.getLogger(__name__)
 
 TIMEOUT = 10  # ✅ 設定 API 超時為 10 秒
 MAX_RETRIES = 3  # ✅ 最多重試 3 次
-LOGIN_INTERVAL = timedelta(hours=6)  # ✅ 每 6 小時執行一次登入
+LOGIN_INTERVAL = timedelta(hours=23)  # ✅ 每 23小時執行一次登入
 
 class GPS51TokenCoordinator:
-    """Coordinator to refresh GPS51 token at fixed intervals."""
+    """Coordinator to refresh GPS51 token at fixed intervals and trigger login every 6 hours."""
 
     def __init__(self, hass: HomeAssistant, username: str, password: str):
         """Initialize the coordinator."""
@@ -22,25 +22,24 @@ class GPS51TokenCoordinator:
         self.password = password
         self.token = None
 
-        # ✅ 檢查 Token 刷新是否有啟動
-        _LOGGER.info("GPS51TokenCoordinator initialized. Will refresh token at 0, 4, 8, 12, 16, 20 and trigger login every 6 hours.")
+        _LOGGER.info("GPS51TokenCoordinator initialized. Will refresh token at 0, 12, and trigger login every 6 hours.")
 
-        # ✅ 在 0, 4, 8, 12, 16, 20 固定時間點更新 Token
+        # ✅ 固定時間點更新 Token
         async_track_time_change(
             self.hass,
             self._schedule_token_refresh,
-            hour=[0, 4, 8, 12, 16, 20],
+            hour=[0, 12],
             minute=0,
             second=0,
         )
 
-        # ✅ 每 6 小時執行一次登入動作，但不影響 Token
+        # ✅ 確保 `_schedule_login_refresh()` 存在
         async_track_time_interval(self.hass, self._schedule_login_refresh, LOGIN_INTERVAL)
 
     @callback
     def _schedule_token_refresh(self, now):
         """Callback triggered to refresh token."""
-        _LOGGER.info("Scheduled token refresh started.")  # ✅ 紀錄 Token 刷新
+        _LOGGER.info("Scheduled token refresh started.")
         self.hass.async_create_task(self._async_update_token())
 
     async def _async_update_token(self):
@@ -80,8 +79,8 @@ class GPS51TokenCoordinator:
             except requests.RequestException as e:
                 _LOGGER.error(f"Attempt {attempt}: Exception during token update: {e}")
 
-            time.sleep(5)  # ✅ 等待 5 秒後再試
-        
+            time.sleep(5)  # ✅ 確保 sleep() 正確運作
+
         _LOGGER.error("All token update attempts failed.")
         return None  # ❌ 如果所有重試都失敗，回傳 None
 
@@ -128,6 +127,6 @@ class GPS51TokenCoordinator:
                 _LOGGER.error(f"Attempt {attempt}: Exception during login request: {e}")
 
             time.sleep(5)  # ✅ 等待 5 秒後再試
-        
+
         _LOGGER.error("All login request attempts failed.")
         return False  # ❌ 如果所有重試都失敗，回傳 False
