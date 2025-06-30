@@ -67,8 +67,8 @@ class GPS51DeviceTracker(TrackerEntity):
             _LOGGER.warning("GPS51 token is missing, skipping update.")
             return
 
-        url = f"{API_URL}?action={LAST_POSITION_ACTION}&token={token}"
-        payload = {"deviceids": [self._deviceid], "lastquerypositiontime": 0}
+        url = f"{API_URL}?action={LAST_POSITION_ACTION}&token={token}&extend=self&serverid=2"
+        payload = {"deviceids": [self._deviceid], "lastquerypositiontime": -1}
         headers = {"Content-Type": "application/json"}
 
         try:
