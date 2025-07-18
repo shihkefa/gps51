@@ -90,7 +90,7 @@ class GPS51DeviceTracker(TrackerEntity):
                 record = records[0]
                 self._attr_latitude = record.get("callat")
                 self._attr_longitude = record.get("callon")
-                self._attr_speed = record.get("speed", 0)
+                self._attr_speed = round(record.get("speed", 0) / 1000, 2)
                 self._attr_status = record.get("strstatusen", "未知")
 
                 _LOGGER.info(f"Updated GPS51: 緯度: {self._attr_latitude}, 經度: {self._attr_longitude}, 速度: {self._attr_speed}, 車輛狀態: {self._attr_status}")
